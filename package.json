@@ -1,0 +1,25 @@
+{
+  "name": "openni",
+  "description": "",
+  "version": "0.1.0",
+  "author": "Pedro Teixeira",
+  "main": "openni.js",
+  "tags": ["kinect", "openni", "browser"],
+  "dependencies": {
+    "openni": "*",
+    "shoe": "*",
+    "emit-stream": "*",
+    "event-stream": "*",
+    "JSONStream": "*",
+    "pup": "*",
+    "browserify": "*"
+  },
+  "devDependencies": {
+    "ecstatic": "*"
+  },
+  "main": "server.js",
+  "preinstall": "node_modules/.bin/browserify browser/browser.js -o browser/openni.js",
+  "repository": 
+   { "type": "git",
+     "url": "http://github.com/pgte/node-openni-browser.git" }
+}
