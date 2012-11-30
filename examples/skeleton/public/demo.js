@@ -7,7 +7,32 @@
 
     console.log('Initializing world...');
 
-    jointNames = ["head", "right_hand", "left_elbow", "right_elbow", "left_hand", "neck", "torso", "waist", "left_foot", "right_foot"]; //, "neck", "rightShoulder", "rightElbow", "rightHand", "leftShoulder", "leftElbow", "leftHand", "torso", "rightHip", "rightKnee", "rightFoot", "leftHip", "leftKnee", "leftFoot"];
+    jointNames = [
+      "head",
+      "neck",
+      "torso",
+      "waist",
+      "left_collar",
+      "left_shoulder",
+      "left_elbow",
+      "left_wrist",
+      "left_hand",
+      "left_fingertip",
+      "right_collar",
+      "right_shoulder",
+      "right_elbow",
+      "right_wrist",
+      "right_hand",
+      "right_fingertip",
+      "left_hip",
+      "left_knee",
+      "left_ankle",
+      "left_foot",
+      "right_hip",
+      "right_knee",
+      "right_ankle",
+      "right_foot"  
+    ];
 
     var joints = {};
 
@@ -44,7 +69,7 @@
   var renderer = world.renderer;
   var joints = world.joints;
 
-  function update(jointName, x, y, z) {
+  function update(jointName, user, x, y, z) {
     var joint = joints[jointName]
     if (joint) {
       joint = joint.position;
@@ -73,9 +98,9 @@
   var refVec = new THREE.Vector3(0, 0, 0);
 
   function render() {
-    // var refJoint = joints.torso || joints.head;
-    // refVec.set(refJoint.position.x, refJoint.position.y, refJoint.position.z);
-    // camera.lookAt(refVec);
+    var refJoint = joints.torso || joints.head;
+    refVec.set(refJoint.position.x, refJoint.position.y, refJoint.position.z);
+    camera.lookAt(refVec);
     renderer.render( scene, camera );
   }
 
