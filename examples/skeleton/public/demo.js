@@ -1,6 +1,6 @@
 (function() {
 
-  jointNames = [
+  var jointNames = [
     "head",
     "neck",
     "torso",
@@ -15,7 +15,7 @@
     "right_shoulder",
     "right_elbow",
     "right_wrist",
-    "right_hand",
+    "right_hand"
     "right_fingertip",
     "left_hip",
     "left_knee",
@@ -29,6 +29,7 @@
 
   //// Connect to skeleton server
   var kinect = openni('/skeleton');
+
 
   //// Initialize Scene
 
@@ -63,7 +64,7 @@
 
   //// Track here which users are in the scene
   var users = {};
-  var refUser;
+  var refUser, refJoint;
 
   //// Initialize new users
   kinect.on('newuser', function(userId) {
@@ -77,12 +78,13 @@
       });
       users[userId] = user;
       refUser = user;
+      refJoint = user.torso || user.head;
     }
   });
 
   //// Remove lost users
   kinect.on('lostuser', function(userId) {
-    console.log('lostuser', user);
+    console.log('lostuser', userId);
     var user = users[userId];
     if (user) {
       var joints = Object.keys(user);
@@ -97,6 +99,7 @@
   jointNames.forEach(function(jointName) {
     kinect.on(jointName, function(userId, x, y, z) {
       var user = users[userId];
+      if (!user) return;
       var joint = user[jointName]
       if (joint) {
         joint = joint.position;
@@ -126,7 +129,6 @@
   var refVec = new THREE.Vector3(0, 0, 0);
 
   function render() {
-    var refJoint = refUser && refUser.torso;
     if (! refJoint) return;
     refVec.set(refJoint.position.x, refJoint.position.y, refJoint.position.z);
     camera.lookAt(refVec);

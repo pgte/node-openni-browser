@@ -23,6 +23,9 @@ module.exports = function() {
   // Transform event emitter into stream
   var skelStream = emitStream.toStream(skeleton);
 
+  // Track no joints by default, let the user bind to them
+  skeleton.setJoints([]);
+
   var sock = shoe(function (stream) {
 
     ///// -----  Write:
@@ -37,8 +40,11 @@ module.exports = function() {
     pup.pipe(stream, parse);
 
     var upStreamEmitter = emitStream.fromStream(parse);
-    upStreamEmitter.on('joints', function(_joints) {
-      console.log('TODO: set joints');
+    
+    // set joints that the remote user tells us to
+    upStreamEmitter.on('joints', function(joints) {
+      console.log('setting joints', joints);
+      skeleton.setJoints(joints);
     });
 
     ///// -----  End:
