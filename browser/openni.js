@@ -4060,8 +4060,137 @@ module.exports = Parser;
 
 });
 
+require.define("/node_modules/emit-stream/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"index.js"}
+});
+
+require.define("/node_modules/emit-stream/index.js",function(require,module,exports,__dirname,__filename,process,global){var EventEmitter = require('events').EventEmitter;
+var through = require('through');
+
+exports = module.exports = function (ev) {
+    if (typeof ev.pipe === 'function') {
+        return exports.fromStream(ev);
+    }
+    else return exports.toStream(ev)
+};
+
+exports.toStream = function (ev) {
+    var s = through(
+        function write (args) {
+            this.emit('data', args);
+        },
+        function end () {
+            var ix = ev._emitStreams.indexOf(s);
+            ev._emitStreams.splice(ix, 1);
+        }
+    );
+    
+    if (!ev._emitStreams) {
+        ev._emitStreams = [];
+        
+        var emit = ev.emit;
+        ev.emit = function () {
+            if (s.writable) {
+                var args = [].slice.call(arguments);
+                ev._emitStreams.forEach(function (es) {
+                    es.write(args);
+                });
+            }
+            emit.apply(ev, arguments);
+        };
+    }
+    ev._emitStreams.push(s);
+    
+    return s;
+};
+
+exports.fromStream = function (s) {
+    var ev = new EventEmitter;
+    
+    s.pipe(through(function (args) {
+        ev.emit.apply(ev, args);
+    }));
+    
+    return ev;
+};
+
+});
+
+require.define("/node_modules/emit-stream/node_modules/through/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"index.js"}
+});
+
+require.define("/node_modules/emit-stream/node_modules/through/index.js",function(require,module,exports,__dirname,__filename,process,global){var Stream = require('stream')
+
+// through
+//
+// a stream that does nothing but re-emit the input.
+// useful for aggregating a series of changing but not ending streams into one stream)
+
+exports = module.exports = through
+through.through = through
+
+//create a readable writable stream.
+
+function through (write, end) {
+  write = write || function (data) { this.emit('data', data) }
+  end = end || function () { this.emit('end') }
+
+  var ended = false, destroyed = false
+  var stream = new Stream()
+  stream.readable = stream.writable = true
+  stream.paused = false  
+  stream.write = function (data) {
+    write.call(this, data)
+    return !stream.paused
+  }
+  //this will be registered as the first 'end' listener
+  //must call destroy next tick, to make sure we're after any
+  //stream piped from here. 
+  stream.on('end', function () {
+    stream.readable = false
+    if(!stream.writable)
+      process.nextTick(function () {
+        stream.destroy()
+      })
+  })
+
+  stream.end = function (data) {
+    if(ended) return 
+    //this breaks, because pipe doesn't check writable before calling end.
+    //throw new Error('cannot call end twice')
+    ended = true
+    if(arguments.length) stream.write(data)
+    this.writable = false
+    end.call(this)
+    if(!this.readable)
+      this.destroy()
+  }
+  stream.destroy = function () {
+    if(destroyed) return
+    destroyed = true
+    ended = true
+    stream.writable = stream.readable = false
+    stream.emit('close')
+  }
+  stream.pause = function () {
+    if(stream.paused) return
+    stream.paused = true
+    stream.emit('pause')
+  }
+  stream.resume = function () {
+    if(stream.paused) {
+      stream.paused = false
+      stream.emit('drain')
+    }
+  }
+  return stream
+}
+
+
+});
+
 require.define("/browser/browser.js",function(require,module,exports,__dirname,__filename,process,global){var shoe = require('shoe');
 var JSONStream = require('JSONStream');
+var emitStream = require('emit-stream');
 
 window.openni = module.exports = function(serverPath) {
   
@@ -4069,19 +4198,21 @@ window.openni = module.exports = function(serverPath) {
   
   var jsonStream = JSONStream.parse([true]);
   var kinect = stream.pipe(jsonStream);
+  var emitter = emitStream.fromStream(jsonStream);
 
   var jsonWriteStream = JSONStream.stringify();
   jsonWriteStream.pipe(stream);
 
+  // Forward the connect event to the kinect object
   stream.on('connect', function() {
-    kinect.emit('connect');
+    emitter.emit('connect');
   });
 
-  kinect.joints = function joints(joints) {
+  emitter.joints = function joints(joints) {
     jsonWriteStream.write(['joints', joints]);
   };
   
-  return kinect;
+  return emitter;
 }
 });
 require("/browser/browser.js");

@@ -9,24 +9,26 @@ var pup = require('pup');
 module.exports = function() {
   var skeleton = OpenNI();
 
-  var skelStream = emitStream.toStream(skeleton);
-  
-  var sock = shoe(function (stream) {
+  var users = [];
 
-    // Keep track of which joints the user wants the server to emit
-    var trackJoints = [];
+  skeleton.on('newuser', function(userId) {
+    if (users.indexOf(userId) < 0) users.push(userId);
+  });
+
+  skeleton.on('lostuser', function(userId) {
+    var index = users.indexOf(userId);
+    if (index >= 0) users.splice(index, 1);
+  });
+
+  // Transform event emitter into stream
+  var skelStream = emitStream.toStream(skeleton);
+
+  var sock = shoe(function (stream) {
 
     ///// -----  Write:
 
-    // Filter all joint changes to the joints the client has requested
-    filterSkel = eventStream.mapSync(function(data) {
-      var jointName = data[0];
-      if (trackJoints.indexOf(jointName) > -1) return data;
-    });
-    pup.pipe(skelStream, filterSkel);
-
     var stringify = JSONStream.stringify();
-    pup.pipe(filterSkel, stringify);
+    pup.pipe(skelStream, stringify);
     pup.pipe(stringify, stream);
 
     ///// -----  Read:
@@ -36,17 +38,20 @@ module.exports = function() {
 
     var upStreamEmitter = emitStream.fromStream(parse);
     upStreamEmitter.on('joints', function(_joints) {
-      trackJoints = _joints;
-      console.log('Joints are now', trackJoints);
+      console.log('TODO: set joints');
     });
-
 
     ///// -----  End:
 
     stream.on('end', function () {
-      pup.unpipe(skelStream, filterSkel);
-      pup.unpipe(filterSkel, stringify);
+      pup.unpipe(skelStream, stringify);
       pup.unpipe(stringify, stream);
+    });
+
+    ///// ----- Notify of already existing users
+
+    users.forEach(function(userId) {
+      skelStream.emit('newuser', userId);
     });
 
   });

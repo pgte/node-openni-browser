@@ -1,12 +1,12 @@
 {
-  "name": "openni",
+  "name": "openni-browser",
   "description": "",
   "version": "0.1.0",
   "author": "Pedro Teixeira",
   "main": "openni.js",
   "tags": ["kinect", "openni", "browser"],
   "dependencies": {
-    "openni": "*",
+    "openni": ">=0.2.3",
     "shoe": "*",
     "emit-stream": "*",
     "event-stream": "*",
