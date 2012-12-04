@@ -15,7 +15,7 @@
     "right_shoulder",
     "right_elbow",
     "right_wrist",
-    "right_hand"
+    "right_hand",
     "right_fingertip",
     "left_hip",
     "left_knee",
