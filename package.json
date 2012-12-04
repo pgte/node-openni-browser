@@ -12,7 +12,8 @@
     "event-stream": "*",
     "JSONStream": "*",
     "pup": "*",
-    "browserify": "*"
+    "browserify": "*",
+    "async": "*"
   },
   "devDependencies": {
     "ecstatic": "*"

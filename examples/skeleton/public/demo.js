@@ -37,15 +37,15 @@
 
     console.log('Initializing world...');
 
-    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+    var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
     camera.position.z = 5000;
 
-    scene = new THREE.Scene();
+    var scene = new THREE.Scene();
 
-    material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-    geometry = new THREE.SphereGeometry( 20 );
+    var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+    var geometry = new THREE.SphereGeometry( 20 );
 
-    renderer = new THREE.WebGLRenderer();
+    var renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     $("#container").append(renderer.domElement);
