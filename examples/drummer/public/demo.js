@@ -21,13 +21,55 @@
 
       console.log('Initializing world...');
 
-      var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+      var camera = new THREE.PerspectiveCamera(
+        35, window.innerWidth / window.innerHeight, 1, 5000 );
+      // camera.position.x = 1000;
+      // camera.position.y = 1000;
       camera.position.z = 5000;
 
-      var scene = new THREE.Scene();
+      // Point camera at user?
+//      camera.lookAt(new THREE.Vector3(-190, 777, 2520));
 
-      var renderer = new THREE.WebGLRenderer();
+      var scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x000000, 1500, 4000);
+
+
+      /// Floor
+      (function() {
+        var imageCanvas = document.createElement( "canvas" ),
+          context = imageCanvas.getContext( "2d" );
+
+        imageCanvas.width = imageCanvas.height = 128;
+
+        context.fillStyle = "#444";
+        context.fillRect( 0, 0, 128, 128 );
+
+        context.fillStyle = "#fff";
+        context.fillRect( 0, 0, 64, 64);
+        context.fillRect( 64, 64, 64, 64 );
+
+        var textureCanvas = new THREE.Texture( imageCanvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+          materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
+
+        textureCanvas.needsUpdate = true;
+        textureCanvas.repeat.set( 1000, 1000 );
+
+        var geometry = new THREE.PlaneGeometry( 100, 100 );
+
+        var meshCanvas = new THREE.Mesh( geometry, materialCanvas );
+        meshCanvas.rotation.x = - Math.PI / 2;
+        meshCanvas.scale.set( 1000, 1000, 1000 );
+
+        scene.add(meshCanvas);
+      }());
+
+
+      /// Renderer
+
+      var renderer = new THREE.WebGLRenderer({antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor( scene.fog.color, 1 );
+      renderer.autoClear = false;
 
       $("#container").append(renderer.domElement);
 
@@ -119,8 +161,8 @@
 
       var drum = new THREE.Mesh(geometry, material);
       drum.position.x = -100;
-      drum.position.y = 600;
-      drum.position.z = 1500; 
+      drum.position.y = 400;
+      drum.position.z = 2000; 
 
       drum.intercepts = function(point) {
         var pos = this.position;
@@ -176,6 +218,7 @@
                 }
               } else if (drum.intercepts(handPos) &&
                          drum.canFire < audioContext.currentTime) {
+                // Did not contain hand and now hand is inside
                 drum.play();
                 drum.canFire = audioContext.currentTime + 0.2;
                 drum.contains[hand] = true;
@@ -188,6 +231,21 @@
       return trigger;
     }());
 
+    ///// ------ Mouse Move
+
+    var mouseX = 0;
+    var mouseY = 0;
+    var windowHalfX = window.innerWidth / 2;
+    var windowHalfY = window.innerHeight / 2;
+
+    function onDocumentMouseMove(event) {
+
+      mouseX = ( event.clientX - windowHalfX );
+      mouseY = ( event.clientY - windowHalfY );
+
+    }
+    document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
     ///// ------ Animation
 
     function animate() {
@@ -196,15 +254,10 @@
       render();
     }
 
-    var refDrum = drums[0];
-    var refVec = new THREE.Vector3(refDrum.position.x, refDrum.position.y, refDrum.position.z);
-    console.log('camera initially looking at', refVec);
-    camera.lookAt(refVec);
-
     function render() {
-      if (! refJoint) return;
-      refVec.set(refJoint.position.x, refJoint.position.y, refJoint.position.z);
-      camera.lookAt(refVec);
+      camera.position.x += ( mouseX - camera.position.x ) * .05;
+      camera.position.y += ( - ( mouseY - 200) - camera.position.y ) * .05;
+      camera.lookAt(scene.position);
       renderer.render(scene, camera);
     }
 
