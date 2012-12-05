@@ -37,18 +37,21 @@
 
     console.log('Initializing world...');
 
-    var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-    camera.position.z = 5000;
+    var camera = new THREE.PerspectiveCamera(
+          35, window.innerWidth / window.innerHeight, 1, 5000 );
+        camera.position.x = 2000;
+        camera.position.y = 1000;
+        camera.position.z = 6000;
 
     var scene = new THREE.Scene();
+    //scene.fog = new THREE.Fog(0x000000, 1500, 4000);
 
-    var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-    var geometry = new THREE.SphereGeometry( 20 );
-
-    var renderer = new THREE.WebGLRenderer();
+    var renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     $("#container").append(renderer.domElement);
+
+    camera.lookAt(scene.position);
 
     return {
       scene: scene
@@ -68,8 +71,13 @@
 
   //// Initialize new users
   kinect.on('newuser', function(userId) {
+
     console.log('newuser', userId);
     if (! users[userId]) {
+
+      var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: false } );
+      var geometry = new THREE.SphereGeometry( 20 );
+
       var user = {};
       jointNames.forEach(function(jointName) {
         var joint = new THREE.Mesh( geometry, material );
@@ -121,6 +129,22 @@
     });
   });
 
+
+  ///// ------ Mouse Move
+
+  var mouseX = 0;
+  var mouseY = 0;
+  var windowHalfX = window.innerWidth / 2;
+  var windowHalfY = window.innerHeight / 2;
+
+  function onDocumentMouseMove(event) {
+
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+
+  }
+  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
   function animate() {
      requestAnimationFrame(animate);
      render();
@@ -129,9 +153,9 @@
   var refVec = new THREE.Vector3(0, 0, 0);
 
   function render() {
-    if (! refJoint) return;
-    refVec.set(refJoint.position.x, refJoint.position.y, refJoint.position.z);
-    camera.lookAt(refVec);
+    camera.position.x += ( mouseX - camera.position.x ) * .05;
+    camera.position.y += ( - ( mouseY) - camera.position.y ) * .05;
+    camera.lookAt(scene.position);
     renderer.render(scene, camera);
   }
 
