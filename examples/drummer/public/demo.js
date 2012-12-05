@@ -2,7 +2,19 @@
 
   //// Initialize audio and then everything else
 
-  audio(function(samples, audioContext) {
+  sampleURLs = [
+    '/samples/Tr1 Snare 1.wav'
+  , '/samples/Tr1 Conga 2.wav'
+  , '/samples/Tr1 Kick 3.wav'
+  , '/samples/Tr1 Cymbal.wav'
+  , '/samples/Tr1 Scratch 1.wav'
+  , '/samples/Tr1 Shaker 2.wav'
+  ];
+
+  audio(sampleURLs, function(err, samples, audioContext) {
+    if (err) throw err;
+
+    console.log('got samples', samples);
     ///------ Which joints to track
 
     var jointNames = [
@@ -154,30 +166,36 @@
 
     var drums = (function() {
       var drums = [];
-      var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-      var radius = 250;
+      var material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } );
+      var radius = 100;
       var halfRadius = radius / 2;
       var geometry = new THREE.CubeGeometry(radius, radius, radius, 1, 1, 1);
 
-      var drum = new THREE.Mesh(geometry, material);
-      drum.position.x = -100;
-      drum.position.y = 400;
-      drum.position.z = 2000; 
+      var x = -(samples.length / 2) * radius;
 
-      drum.intercepts = function(point) {
-        var pos = this.position;
-        return (pos.x - halfRadius < point.x) && (pos.x + halfRadius > point.x) &&
-               (pos.y - halfRadius < point.y) && (pos.y + halfRadius > point.y) &&
-               (pos.z - halfRadius < point.z) && (pos.z + halfRadius > point.z)
-               ;
-      };
+      samples.forEach(function(sample) {
+        var drum = new THREE.Mesh(geometry, material);
+        drum.position.x = x;
+        drum.position.y = 400;
+        drum.position.z = 2000; 
 
-      drum.sample = samples['/samples/Tr1 Kick 3.wav'];
-      drum.contains = {};
-      drum.canFire = 0;
+        drum.intercepts = function(point) {
+          var pos = this.position;
+          return (pos.x - halfRadius < point.x) && (pos.x + halfRadius > point.x) &&
+                 (pos.y - halfRadius < point.y) && (pos.y + halfRadius > point.y) &&
+                 (pos.z - halfRadius < point.z) && (pos.z + halfRadius > point.z)
+                 ;
+        };
 
-      drums.push(drum);
-      scene.add(drum);
+        drum.sample = sample;
+        drum.contains = {};
+        drum.canFire = 0;
+
+        drums.push(drum);
+        scene.add(drum);
+
+        x += radius;
+      });
 
       return drums;
     }());
@@ -197,10 +215,15 @@
 
       drums.forEach(function(drum) {
         drum.play = function() {
+          var oldColor = drum.material.color;
+          drum.material.color = 0xff0000;
           var osc = audioContext.createBufferSource();
           osc.buffer = drum.sample;
           osc.connect(audioContext.destination);
           osc.noteOn(0);
+          setTimeout(function() {
+            drum.material.color = oldColor;
+          }, 1000);
         };
       });
 
