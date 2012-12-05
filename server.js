@@ -28,6 +28,8 @@ module.exports = function() {
 
   var sock = shoe(function (stream) {
 
+    console.log('client connected');
+
     ///// -----  Write:
 
     var stringify = JSONStream.stringify();
@@ -43,7 +45,6 @@ module.exports = function() {
     
     // set joints that the remote user tells us to
     upStreamEmitter.on('joints', function(joints) {
-      console.log('setting joints', joints);
       skeleton.setJoints(joints);
     });
 

@@ -38,16 +38,16 @@
     console.log('Initializing world...');
 
     var camera = new THREE.PerspectiveCamera(
-          35, window.innerWidth / window.innerHeight, 1, 5000 );
+          35, window.innerWidth / window.innerHeight, 1, 8000 );
         camera.position.x = 2000;
         camera.position.y = 1000;
-        camera.position.z = 6000;
+        camera.position.z = 7000;
 
     var scene = new THREE.Scene();
     //scene.fog = new THREE.Fog(0x000000, 1500, 4000);
 
     var renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight - 100);
 
     $("#container").append(renderer.domElement);
 
@@ -67,7 +67,6 @@
 
   //// Track here which users are in the scene
   var users = {};
-  var refUser, refJoint;
 
   //// Initialize new users
   kinect.on('newuser', function(userId) {
@@ -85,8 +84,6 @@
         scene.add(joint);
       });
       users[userId] = user;
-      refUser = user;
-      refJoint = user.torso || user.head;
     }
   });
 
@@ -130,32 +127,12 @@
   });
 
 
-  ///// ------ Mouse Move
-
-  var mouseX = 0;
-  var mouseY = 0;
-  var windowHalfX = window.innerWidth / 2;
-  var windowHalfY = window.innerHeight / 2;
-
-  function onDocumentMouseMove(event) {
-
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-
-  }
-  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
   function animate() {
      requestAnimationFrame(animate);
      render();
   }
 
-  var refVec = new THREE.Vector3(0, 0, 0);
-
   function render() {
-    camera.position.x += ( mouseX - camera.position.x ) * .05;
-    camera.position.y += ( - ( mouseY) - camera.position.y ) * .05;
-    camera.lookAt(scene.position);
     renderer.render(scene, camera);
   }
 
