@@ -21,6 +21,59 @@
   , '/samples/Tr1 Snare 5.wav'
   , '/samples/Tr1 Tom 1.wav'
   , '/samples/Tr1 Tom 2.wav'
+  // , '/samples/fx/01.wav'
+  // , '/samples/fx/02.wav'
+  // , '/samples/fx/03.wav'
+  // , '/samples/fx/04.wav'
+  // , '/samples/fx/05.wav'
+  // , '/samples/fx/06.wav'
+  // , '/samples/fx/07.wav'
+  // , '/samples/fx/08.wav'
+  // , '/samples/fx/09.wav'
+  // , '/samples/fx/10.wav'
+  // , '/samples/fx/11.wav'
+  // , '/samples/fx/12.wav'
+  // , '/samples/fx/13.wav'
+  // , '/samples/fx/14.wav'
+  // , '/samples/fx/15.wav'
+  // , '/samples/fx/16.wav'
+  // , '/samples/fx/17.wav'
+  // , '/samples/fx/18.wav'
+  // , '/samples/fx/19.wav'
+  // , '/samples/fx/20.wav'
+  // , '/samples/fx/21.wav'
+  // , '/samples/fx/22.wav'
+  // , '/samples/fx/23.wav'
+  // , '/samples/fx/24.wav'
+  // , '/samples/fx/25.wav'
+  // , '/samples/fx/26.wav'
+  // , '/samples/fx/27.wav'
+  // , '/samples/fx/28.wav'
+  // , '/samples/fx/29.wav'
+  // , '/samples/fx/30.wav'
+  // , '/samples/fx/31.wav'
+  // , '/samples/fx/32.wav'
+  // , '/samples/fx/33.wav'
+  // , '/samples/fx/34.wav'
+  // , '/samples/fx/35.wav'
+  // , '/samples/fx/36.wav'
+  // , '/samples/fx/37.wav'
+  // , '/samples/fx/38.wav'
+  // , '/samples/fx/39.wav'
+  // , '/samples/fx/40.wav'
+  // , '/samples/fx/41.wav'
+  // , '/samples/fx/42.wav'
+  // , '/samples/fx/43.wav'
+  // , '/samples/fx/44.wav'
+  // , '/samples/fx/45.wav'
+  // , '/samples/fx/46.wav'
+  // , '/samples/fx/47.wav'
+  // , '/samples/fx/48.wav'
+  // , '/samples/fx/49.wav'
+  // , '/samples/fx/50.wav'
+  // , '/samples/fx/51.wav'
+  // , '/samples/fx/52.wav'
+  // , '/samples/fx/53.wav'
   ];
 
   audio(sampleURLs, function(err, samples, audioContext) {
@@ -184,27 +237,26 @@
 
       var drums = (function() {
         var drums = [];
-        var radius = 70;
+        var maxWidth = 70 * 15;
+        var radius = maxWidth / samples.length;
         var halfRadius = radius / 2;
-        var geometry = new THREE.CubeGeometry(radius, radius, radius, 1, 1, 1);
+        var geometry = new THREE.CubeGeometry(radius, 100, 300, 1, 1, 1);
 
-        var x = -(samples.length / 2) * radius;
+        var x = -(samples.length / 2 * 1.5) * radius;
         var color = 0xffffff;
         var colorGrad = Math.floor(color / samples.length / 2);
-        console.log('colorGrad', colorGrad);
 
         samples.forEach(function(sample) {
           var material = new THREE.MeshBasicMaterial( { color: color, wireframe: false, fog: false } );
           var drum = new THREE.Mesh(geometry, material);
           drum.position.x = x;
-          drum.position.y = 400;
-          drum.position.z = 2000; 
+          drum.position.y = 200;
+          drum.position.z = 2300; 
 
           drum.intercepts = function(point) {
             var pos = this.position;
             return (pos.x - halfRadius < point.x) && (pos.x + halfRadius > point.x) &&
-                   (pos.y - halfRadius < point.y) && (pos.y + halfRadius > point.y) &&
-                   (pos.z - halfRadius < point.z) && (pos.z + halfRadius > point.z)
+                   (pos.y - halfRadius < point.y) && (pos.y + halfRadius > point.y)
                    ;
           };
 
@@ -215,9 +267,8 @@
           drums.push(drum);
           scene.add(drum);
 
-          x += radius;
+          x += radius + halfRadius;
           color -= colorGrad;
-          console.log('color:', color);
         });
 
         return drums;
