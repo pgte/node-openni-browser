@@ -101,6 +101,13 @@ jointNames.forEach(function(jointName) {
 });
 ```
 
+# Connection Handling
+
+The `skeleton` object will also emit:
+
+* `connect` — when there is a connection to the server
+* `end` — when the connection to the server is ended
+
 ## Examples
 
 See the `examples` folder.
