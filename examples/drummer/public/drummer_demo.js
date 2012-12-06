@@ -140,6 +140,7 @@
           var meshCanvas = new THREE.Mesh( geometry, materialCanvas );
           meshCanvas.rotation.x = - Math.PI / 2;
           meshCanvas.scale.set( 1000, 1000, 1000 );
+          meshCanvas.position.y = -100;
 
           scene.add(meshCanvas);
         }());
@@ -250,7 +251,7 @@
           var material = new THREE.MeshBasicMaterial( { color: color, wireframe: false, fog: false } );
           var drum = new THREE.Mesh(geometry, material);
           drum.position.x = x;
-          drum.position.y = 200;
+          drum.position.y = 50;
           drum.position.z = 2300; 
 
           drum.intercepts = function(point) {

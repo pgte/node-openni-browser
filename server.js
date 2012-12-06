@@ -58,7 +58,8 @@ module.exports = function() {
     ///// ----- Notify of already existing users
 
     users.forEach(function(userId) {
-      skelStream.emit('newuser', userId);
+      stringify.write(['newuser', userId]);
+      console.log('wrote', ['newuser', userId]);
     });
 
   });
