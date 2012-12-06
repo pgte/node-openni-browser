@@ -86,5 +86,9 @@ window.openni = module.exports = function(serverPath) {
     emitter.emit('connect');
   });
 
+  stream.on('end', function() {
+    emitter.emit('end');
+  });
+
   return emitter;
 }
