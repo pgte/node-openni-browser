@@ -31,30 +31,30 @@ window.openni = module.exports = function(serverPath) {
     "right_foot"  
   ];
   
-  var stream = shoe(serverPath);
+  var sock = shoe(serverPath);
 
   var jsonStream = JSONStream.parse([true]);
-  var kinect = stream.pipe(jsonStream);
-  var emitter = emitStream.fromStream(jsonStream);
+  var kinect = sock.pipe(jsonStream);
+  var skeleton = emitStream.fromStream(jsonStream);
 
   var jsonWriteStream = JSONStream.stringify();
-  jsonWriteStream.pipe(stream);
+  jsonWriteStream.pipe(sock);
 
-  emitter.joints = function(joints) {
+  skeleton.joints = function(joints) {
     jsonWriteStream.write(['joints', joints]);
   };
 
   // Intercept emitter add and remove listener calls to register for joints
   (function() {
-    var oldAddListener = emitter.addListener;
-    var oldRemoveListener = emitter.removeListener;
+    var oldAddListener = skeleton.addListener;
+    var oldRemoveListener = skeleton.removeListener;
     var joints = [];
 
     function updateRemoteJoints() {
-      emitter.joints(joints);
+      skeleton.joints(joints);
     }
     
-    emitter.addListener = emitter.on = function(eventType, callback) {
+    skeleton.addListener = skeleton.on = function(eventType, callback) {
       if (jointNames.indexOf(eventType) >= 0) {
         // It's a joint
         if (joints.indexOf(eventType) < 0) {
@@ -62,10 +62,10 @@ window.openni = module.exports = function(serverPath) {
           updateRemoteJoints();
         }
       }
-      oldAddListener.apply(emitter, arguments);
+      oldAddListener.apply(skeleton, arguments);
     };
 
-    emitter.removeListener = function(eventType, callback) {
+    skeleton.removeListener = function(eventType, callback) {
       console.log('removeListener', arguments);
       if (jointNames.indexOf(eventType) >= 0) {
         // It's a joint
@@ -75,20 +75,22 @@ window.openni = module.exports = function(serverPath) {
           updateRemoteJoints();
         }
       }
-      oldRemoveListener.apply(emitter, arguments);
+      oldRemoveListener.apply(skeleton, arguments);
     }
 
   }());
 
 
   // Forward the connect event to the kinect object
-  stream.on('connect', function() {
-    emitter.emit('connect');
+  sock.on('connect', function() {
+    skeleton.emit('connect');
   });
 
-  stream.on('end', function() {
-    emitter.emit('end');
+  sock.on('end', function() {
+    skeleton.emit('end');
   });
 
-  return emitter;
+  skeleton.sock = sock;
+
+  return skeleton;
 }
