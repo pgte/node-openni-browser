@@ -6,7 +6,7 @@
   "main": "openni.js",
   "tags": ["kinect", "openni", "browser"],
   "dependencies": {
-    "openni": ">=0.2.3",
+    "openni": ">=0.2.6",
     "shoe": "*",
     "emit-stream": "*",
     "event-stream": "*",
