@@ -111,6 +111,8 @@ The `skeleton` object will also emit:
 * `connect` — when there is a connection to the server
 * `end` — when the connection to the server is ended
 
+The `skeleton` object also has a `.sock` property exposing the [shoe](https://github.com/substack/shoe) socket.
+
 ## Examples
 
 See the `examples` folder.
