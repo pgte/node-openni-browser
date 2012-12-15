@@ -1,7 +1,7 @@
 {
   "name": "openni-browser",
   "description": "",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "author": "Pedro Teixeira",
   "main": "openni.js",
   "tags": ["kinect", "openni", "browser", "skeleton"],
