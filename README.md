@@ -52,6 +52,7 @@ Listen for user events:
 ```js
 [
   'newuser',
+  'userexit',
   'lostuser',
   'posedetected',
   'calibrationstart',
