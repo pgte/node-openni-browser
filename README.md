@@ -8,6 +8,8 @@ Uses Socks.js (via [Shoe](https://github.com/substack/shoe)).
 
 ## Install
 
+Install libusb and OpenNI following the platform-specific instructions at https://github.com/OpenNI/OpenNI
+
 ```bash
 $ npm install openni-browser
 ```

@@ -4,7 +4,7 @@
   "version": "0.1.4",
   "author": "Pedro Teixeira",
   "main": "openni.js",
-  "tags": ["kinect", "openni", "browser"],
+  "tags": ["kinect", "openni", "browser", "skeleton"],
   "dependencies": {
     "openni": ">=0.2.6",
     "shoe": "*",
